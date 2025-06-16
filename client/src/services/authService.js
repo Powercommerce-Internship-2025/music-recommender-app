@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Kreiramo axios instancu s baznim URL-om
 const apiClient = axios.create({
-  baseURL: `http://localhost:${import.meta.env.VITE_API_PORT || 3000}/api/auth`,
+  baseURL: `http://localhost:${import.meta.env.VITE_API_PORT || 5000}/api/auth`,
   headers: {
     'Content-Type': 'application/json'
   }

@@ -1,3 +1,41 @@
+/* Tailwind osnovni stilovi */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 
+    Animacija za fade-in na naslov 
+*/
+
+@keyframes fade-in {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out;
+}
+
+/* 
+    Animacija za skaliranje dugmadi na hover 
+*/
+
+.btn-scale {
+  @apply transform transition duration-300 hover:scale-105;
+}
+
+/* 
+    Gradient pozadina 
+*/
+
+.bg-gradient-hero {
+  background: linear-gradient(135deg, #1e3a8a, #7c3aed);
+}
+
+/* 
+    Globalni stilovi 
+*/
+
+body {
+  @apply bg-gray-100 font-['Poppins'];
+}
