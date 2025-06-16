@@ -1,65 +1,105 @@
 import { useState } from 'react';
-import { register } from '../services/authService';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaUserPlus } from 'react-icons/fa';
+import authService from '../services/authService';
+import { validateEmail, validatePassword, validateUsername } from '../utils/validators';
 
-/*
-  Register stranica
-*/
-
+/**
+ * Stranica za registraciju korisnika
+ * @returns {JSX.Element} Forma za registraciju
+ */
 function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const validateForm = () => {
+    const newErrors = {
+      username: validateUsername(username),
+      email: validateEmail(email),
+      password: validatePassword(password),
+    };
+    setErrors(newErrors);
+    return !Object.values(newErrors).some((error) => error);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    setLoading(true);
+    setErrors({});
     try {
-      await register({ username, email, password });
+      await authService.register({ username, email, password });
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.error || 'Greška pri registraciji');
+      setErrors({ server: err.response?.data?.error || 'Greška pri registraciji' });
+      console.error('Greška pri registraciji:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl mb-4">Registracija</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      <form onSubmit={handleSubmit} className="max-w-sm">
-        <div className="mb-4">
-          <label className="block mb-1">Korisničko ime</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-2 border"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1">Lozinka</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border"
-            required
-          />
-        </div>
-        <button type="submit" className="bg-blue-500 text-white p-2">Registruj se</button>
-      </form>
+    <div className="min-h-screen bg-gradient-hero text-white flex items-center justify-center px-4">
+      <div className="bg-white bg-opacity-10 backdrop-blur-lg p-8 rounded-xl max-w-md w-full animate-fade-in">
+        <h2 className="text-3xl font-bold mb-6 text-center">Sign up</h2>
+        {errors.server && <p className="text-red-300 mb-4 text-center">{errors.server}</p>}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block mb-1 font-medium">Username</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-blue-500"
+              required
+            />
+            {errors.username && <p className="text-red-300 mt-1">{errors.username}</p>}
+          </div>
+          <div className="mb-4">
+            <label className="block mb-1 font-medium">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-blue-500"
+              required
+            />
+            {errors.email && <p className="text-red-300 mt-1">{errors.email}</p>}
+          </div>
+          <div className="mb-6">
+            <label className="block mb-1 font-medium">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-blue-500"
+              required
+            />
+            {errors.password && <p className="text-red-300 mt-1">{errors.password}</p>}
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg btn-scale flex items-center justify-center"
+          >
+            {loading ? 'Loading...' : (
+              <>
+                <FaUserPlus className="mr-2" /> Sign up
+              </>
+            )}
+          </button>
+        </form>
+        <p className="mt-4 text-center">
+          You already have an account?{' '}
+          <Link to="/login" className="text-blue-400 hover:text-blue-300">
+            Sign in
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
