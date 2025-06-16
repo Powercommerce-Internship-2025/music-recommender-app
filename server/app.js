@@ -17,6 +17,11 @@ app.use(cors({
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 
+// Osnovna ruta za provjeru da li server radi
+app.get('/health', (req, res) => {
+  res.json({ message: 'Music Recommender API' });
+});
+
 sequelize.sync().then(() => {
   console.log('Baza podataka povezana');
 }).catch(err => {
