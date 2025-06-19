@@ -1,7 +1,9 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-require('dotenv').config();
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 /*
   Kreiranje korisnika tj registracija
@@ -40,4 +42,4 @@ const logout = (req, res) => {
   res.json({ message: 'Odjavljen' });
 };
 
-module.exports = { register, login, logout };
+export { register, login, logout };

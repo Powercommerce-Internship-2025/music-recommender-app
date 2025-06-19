@@ -1,7 +1,7 @@
-const express = require('express');
-const cors = require('cors');
-const sequelize = require('./config/db');
-const authRoutes = require('./routes/authRoutes');
+import express from 'express';
+import cors from 'cors';
+import sequelize from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
@@ -28,4 +28,4 @@ sequelize.sync().then(() => {
   console.error('Greška pri povezivanju baze:', err);
 });
 
-module.exports = app;
+export default app;
