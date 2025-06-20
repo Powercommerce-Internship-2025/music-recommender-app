@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// Kreiramo axios instancu s baznim URL-om
 const apiClient = axios.create({
   baseURL: `http://localhost:${import.meta.env.VITE_API_PORT || 5000}/api/auth`,
   headers: {
@@ -23,11 +22,12 @@ apiClient.interceptors.request.use(
 /**
  * Servis za autentikaciju korisnika
  */
+
 const authService = {
   /**
    * Registracija novog korisnika
-   * @param {Object} userData - Podaci korisnika (username, email, password)
-   * @returns {Promise} Promise s podacima o korisniku
+   * @param {Object} userData
+   * @returns {Promise}
    */
   register: async (userData) => {
     try {
@@ -41,8 +41,8 @@ const authService = {
 
   /**
    * Prijava korisnika
-   * @param {Object} userData - Podaci za prijavu (email, password)
-   * @returns {Promise} Promise s podacima o korisniku i tokenom
+   * @param {Object} userData
+   * @returns {Promise}
    */
   login: async (userData) => {
     try {
@@ -59,7 +59,7 @@ const authService = {
 
   /**
    * Odjava korisnika
-   * @returns {Promise} Promise koji se razrješava nakon odjave
+   * @returns {Promise}
    */
   logout: async () => {
     try {
@@ -67,7 +67,6 @@ const authService = {
       localStorage.removeItem('token');
     } catch (error) {
       console.error('Greška pri odjavi:', error.response?.data || error.message);
-      // Svejedno uklanjamo token iz lokalnog spremišta
       localStorage.removeItem('token');
       throw error;
     }
@@ -75,7 +74,7 @@ const authService = {
 
   /**
    * Provjera je li korisnik prijavljen
-   * @returns {Boolean} True ako je korisnik prijavljen
+   * @returns {Boolean}
    */
   isAuthenticated: () => {
     return !!localStorage.getItem('token');

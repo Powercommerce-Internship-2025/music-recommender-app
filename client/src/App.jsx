@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import Browse from './pages/Browse';
 import Navbar from './components/Navbar';
 
 /**
@@ -28,6 +29,14 @@ function App() {
           element={
             <>
               <Dashboard />
+            </>
+          }
+        />
+        <Route
+          path="/browse"
+          element={
+            <>
+              <Browse />
             </>
           }
         />

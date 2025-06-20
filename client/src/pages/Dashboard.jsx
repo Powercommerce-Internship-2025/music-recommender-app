@@ -6,7 +6,7 @@ import { FaMusic, FaStar, FaUser } from 'react-icons/fa';
 
 /**
  * Stranica sa kontrolnom tablom za prijavljene korisnike
- * @returns {JSX.Element} Modernizirana dashboard stranica sa opcijama za pretragu, preporuke i profil
+ * @returns {JSX.Element}
  */
 function Dashboard() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ function Dashboard() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-hero text-white flex flex-col items-center">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 text-white flex flex-col">
       <Navbar />
       <div className="pt-20 w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-center justify-center min-h-[calc(100vh-64px)]">
         <h2 className="text-4xl md:text-5xl font-bold mb-6 animate-fade-in text-center">
