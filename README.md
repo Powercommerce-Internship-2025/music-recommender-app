@@ -12,7 +12,7 @@ cd music-recommender-app
 ```
 ---
 
-### 2. Set up PostgreSQL Database:**
+### 2. Set up PostgreSQL Database:
 Open your terminal and connect to PostgreSQL.  
 Create a new database for the project:  
 
