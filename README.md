@@ -28,13 +28,18 @@ psql -U postgres -c "CREATE DATABASE music_db;"
   
   **Install backend dependencies:**  
   ```bash
-    npm install
-    npm install --save-dev dotenv-cli  
+npm install
+npm install --save-dev dotenv-cli  
 ```
 
   **Run the database migrations (see section below for more details):**
   ```bash
-    npx dotenv -e .env -- npx sequelize-cli db:migrate
+npx dotenv -e .env -- npx sequelize-cli db:migrate
+```
+
+**For undo migration (if necessary):**
+```bash
+npx dotenv -e .env -- npx sequelize-cli db:migrate:undo:all
 ```
 
 ---
