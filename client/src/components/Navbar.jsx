@@ -5,7 +5,7 @@ import { FaSignOutAlt, FaMusic, FaStar, FaUser, FaBars, FaTimes } from 'react-ic
 
 /**
  * Navigaciona traka za aplikaciju
- * @returns {JSX.Element} Modernizirana navigaciona traka sa linkovima i odjavom
+ * @returns {JSX.Element}
  */
 function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
@@ -31,7 +31,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-gradient-hero bg-opacity-90 backdrop-blur-lg shadow-lg fixed w-full top-0 z-10">
+    <nav className="fixed top-0 left-0 w-full bg-gray-900 bg-opacity-90 backdrop-blur-sm z-50 shadow-md">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         {}
         <Link to="/dashboard" className="text-2xl font-bold text-white flex items-center animate-fade-in">

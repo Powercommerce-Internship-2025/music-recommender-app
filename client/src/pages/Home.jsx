@@ -3,7 +3,7 @@ import { FaSignInAlt, FaUserPlus } from 'react-icons/fa';
 
 /**
  * Početna stranica aplikacije
- * @returns {JSX.Element} Početna stranica sa pozivom na akciju
+ * @returns {JSX.Element}
  */
 function Home() {
   return (
