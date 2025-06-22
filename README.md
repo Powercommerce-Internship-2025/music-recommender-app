@@ -1,60 +1,29 @@
-##PRVA VERZIJA (MIJENJAT ĆE SE)##
-
 **Music Recommender App**
 
-Web aplikacija za preporuku muzičkih albuma i izvođača. Implementirana autentifikacija sa JWT i PostgreSQL.
+**Installation Guide**
 
-**Tech Stack**
-Frontend: React, Vite, Tailwind CSS
-Backend: Node.js, Express, Sequelize
-Baza podataka: PostgreSQL
-API: Last.fm (planirana integracija)
-Alati: pgAdmin4 za upravljanje bazom
+**1. Clone the repository:**
+  git clone https://github.com/Powercommerce-Internship-2025/music-recommender-app.git
+  cd music-recommender-app
+  
+**2. Set up PostgreSQL Database:**
+Open your terminal and connect to PostgreSQL. 
+Create a new database for the project:
+  psql -U postgres -c "CREATE DATABASE music_db;"
+  
+**3. Configure backend:**
+  Navigate to the server directory: cd server/
+  Open .env file in the server/ root and add the following environment variables. Replace "password" with your actual PostgreSQL password.
+  **Install backend dependencies:**
+    npm install
+    npm install --save-dev dotenv-cli
+  **Run the database migrations (see section below for more details):**
+    npx dotenv -e .env -- npx sequelize-cli db:migrate
 
-**Setup**
-Kloniraj repozitorij:git clone https://github.com/Powercommerce-Internship-2025/music-recommender-app.git
-                     cd music-recommender-app
+**4. Configure Frontend:**
+In a new terminal, navigate to the client directory: cd client/
+  Install frontend dependencies: 
+  npm install
 
-
-**Postavi PostgreSQL:**
-Instaliraj PostgreSQL: sudo apt install postgresql
-Kreiraj bazu: psql -U postgres -c "CREATE DATABASE music_db;"
-
-
-**Backend:**
-Kreiraj .env fajl u server/:DATABASE_URL=postgresql://postgres:password123@localhost:5432/music_db
-JWT_SECRET=sakrijmehehe
-PORT=5000
-
-
-**Instaliraj i pokreni:**
-cd server/
-npm install
-npm install --save-dev dotenv-cli
-npx dotenv -e .env -- npx sequelize-cli db:migrate
-npm start
-
-
-**Frontend:**
-Instaliraj i pokreni:
-cd client/
-npm install
-npm run dev
-
-
-**Upravljanje bazom:**
-Instaliraj pgAdmin4
-Poveži se na music_db s korisnikom postgres i lozinkom iz .env.
-
-
-
-**Implementirane funkcionalnosti**
-
-Autentifikacija: Registracija, prijava korisnika.
-Baza podataka: PostgreSQL sa Sequelize modelom za korisnike.
-
-**Sljedeći koraci**
-
-Integracija Last.fm API-ja.
-Implementacija kataloga albuma/izvođača i preporuka.
+    
 
