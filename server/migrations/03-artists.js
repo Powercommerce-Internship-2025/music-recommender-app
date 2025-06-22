@@ -1,10 +1,4 @@
-'use strict';
-
-/*
-  Migracija za kreiranje tabele artists
-*/
-
-module.exports = {
+export default {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('artists', {
       id: {
