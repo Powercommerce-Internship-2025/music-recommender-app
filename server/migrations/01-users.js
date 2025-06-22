@@ -1,38 +1,25 @@
-'use strict';
-
-/*
-  Migracija za kreiranje tabele albums
-*/
-
-module.exports = {
+export default {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('albums', {
+    await queryInterface.createTable('users', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
+      username: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
       },
-      genres: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
-        allowNull: false,
-        defaultValue: [],
-      },
-      coverArt: {
+      email: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
+        unique: true,
       },
-      year: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: true,
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
@@ -46,6 +33,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('albums');
+    await queryInterface.dropTable('users');
   },
 };

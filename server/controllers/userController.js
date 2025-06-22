@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
+import { Album, Like, User, Artist } from '../models/index.js';
 import dotenv from 'dotenv';
 
 dotenv.config();

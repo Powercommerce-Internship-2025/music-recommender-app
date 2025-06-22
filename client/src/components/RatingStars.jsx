@@ -3,8 +3,8 @@ import { FaStar } from 'react-icons/fa';
 
 /**
  * Kompaktna komponenta za ocjenjivanje
- * @param {Object} props Rating i callback za ocjenu
- * @returns {JSX.Element} Zvjezdice za ocjenjivanje
+ * @param {Object} props
+ * @returns {JSX.Element}
  */
 function RatingStars({ rating = 0, onRate }) {
   const [hover, setHover] = useState(null);

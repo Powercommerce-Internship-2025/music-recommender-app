@@ -1,13 +1,11 @@
+// models/Like.js
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
-import User from './User.js';
-import Album from './Album.js';
-import Artist from './Artist.js';
+
 
 /*
   Definisanje modela za preference (like/rating)
 */
-
 const Like = sequelize.define('Like', {
   id: {
     type: DataTypes.INTEGER,
@@ -17,7 +15,7 @@ const Like = sequelize.define('Like', {
   },
   rating: {
     type: DataTypes.INTEGER,
-    allowNull: true, // Ocjena od 1 do 5, null ako je samo "like"
+    allowNull: true,
     validate: {
       min: 1,
       max: 5,
@@ -33,7 +31,7 @@ const Like = sequelize.define('Like', {
   },
   albumId: {
     type: DataTypes.INTEGER,
-    allowNull: true, // Može biti null ako je like za izvođača
+    allowNull: true,
     references: {
       model: 'albums',
       key: 'id',
@@ -41,7 +39,7 @@ const Like = sequelize.define('Like', {
   },
   artistId: {
     type: DataTypes.INTEGER,
-    allowNull: true, // Može biti null ako je like za album
+    allowNull: true,
     references: {
       model: 'artists',
       key: 'id',
@@ -53,20 +51,9 @@ const Like = sequelize.define('Like', {
   indexes: [
     {
       unique: true,
-      fields: ['userId', 'albumId'], // Osigurava da korisnik može lajkati album samo jednom
-    },
-    {
-      unique: true,
-      fields: ['userId', 'artistId'], // Osigurava da korisnik može lajkati izvođača samo jednom
+      fields: ['userId', 'albumId', 'artistId'],
     },
   ],
 });
-
-Like.belongsTo(User, { foreignKey: 'userId' });
-Like.belongsTo(Album, { foreignKey: 'albumId' });
-Like.belongsTo(Artist, { foreignKey: 'artistId' });
-User.hasMany(Like, { foreignKey: 'userId' });
-Album.hasMany(Like, { foreignKey: 'albumId' });
-Artist.hasMany(Like, { foreignKey: 'artistId' });
 
 export default Like;

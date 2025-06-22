@@ -1,10 +1,10 @@
+// models/Album.js
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
 
 /*
   Definisanje modela za albume
 */
-
 const Album = sequelize.define('Album', {
   id: {
     type: DataTypes.INTEGER,
@@ -13,6 +13,10 @@ const Album = sequelize.define('Album', {
     primaryKey: true,
   },
   name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  artist: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -36,6 +40,12 @@ const Album = sequelize.define('Album', {
 }, {
   timestamps: true,
   tableName: 'albums',
+  indexes: [
+    {
+      unique: true,
+      fields: ['name', 'artist'],
+    },
+  ],
 });
 
 export default Album;

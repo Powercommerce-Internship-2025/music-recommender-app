@@ -7,7 +7,6 @@ const apiClient = axios.create({
   },
 });
 
-// Interceptor za dodavanje tokena
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -64,6 +63,28 @@ const musicService = {
       return response.data;
     } catch (error) {
       console.error('Greška pri dodavanju like-a:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  /**
+   * Dohvatanje ID-a albuma ili izvođača iz baze
+   * @param {string} type
+   * @param {string} name
+   * @param {string} artist
+   * @returns {Promise}
+   */
+  getItemId: async (type, name, artist = '') => {
+    try {
+      const response = await apiClient.get(`/${type}s`, { params: { query: name } });
+      const items = Array.isArray(response.data) 
+        ? response.data 
+        : response.data.results?.[`${type}matches`]?.[type] || [];
+      const item = items.find(i => i.name === name && (!artist || i.artist === artist));
+      if (!item) throw new Error(`${type.charAt(0).toUpperCase() + type.slice(1)} nije pronađen u bazi`);
+      return item;
+    } catch (error) {
+      console.error(`Greška pri dohvatanju ID-a za ${type}:`, error.response?.data || error.message);
       throw error;
     }
   },

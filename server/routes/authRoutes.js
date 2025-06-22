@@ -6,6 +6,7 @@ const router = express.Router();
 /*
     Definisane rute za app
 */
+
 router.post('/register', register);
 router.post('/login', login);
 router.post('/logout', logout);
