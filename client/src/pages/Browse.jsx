@@ -9,8 +9,15 @@ import musicService from '../services/musicService';
 function Browse() {
   const [albums, setAlbums] = useState([]);
   const [artists, setArtists] = useState([]);
+  
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(false);
+  
+  const [lastAlbumSearch, setLastAlbumSearch] = useState('');
+  const [lastArtistSearch, setLastArtistSearch] = useState('');
+
+  const [loadingAlbums, setLoadingAlbums] = useState(false);
+  const [loadingArtists, setLoadingArtists] = useState(false);
+
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [sortOption, setSortOption] = useState('name-asc');
@@ -20,60 +27,67 @@ function Browse() {
     if (!authService.isAuthenticated()) {
       navigate('/login');
     }
-    fetchData();
-  }, [navigate, sortOption]);
-
-  const fetchData = async (query = searchQuery) => {
-    setLoading(true);
-    setError('');
-    try {
-      const albumData = await musicService.getAlbums(query);
-      const artistData = await musicService.getArtists(query);
-      
-      setAlbums(sortItems(albumData, sortOption));
-      setArtists(sortItems(artistData, sortOption));
-
-    } catch (error) {
-      console.error('Greška pri dohvatanju podataka:', error);
-      setError('Ne možemo učitati podatke. Pokušajte ponovo kasnije.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [navigate]);
 
   const sortItems = (items, option) => {
+    if (!items) return [];
     const [field, direction] = option.split('-');
     return [...items].sort((a, b) => {
       const valueA = a[field]?.toLowerCase() || '';
       const valueB = b[field]?.toLowerCase() || '';
-      if (direction === 'asc') {
-        return valueA.localeCompare(valueB);
-      }
-      return valueB.localeCompare(valueA);
+      return direction === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
     });
   };
-  
+
+  useEffect(() => {
+    setAlbums(prev => sortItems(prev, sortOption));
+    setArtists(prev => sortItems(prev, sortOption));
+  }, [sortOption]);
+
+  useEffect(() => {
+    if (!lastAlbumSearch) return;
+    const fetchAlbums = async () => {
+      setLoadingAlbums(true);
+      setError('');
+      try {
+        const data = await musicService.getAlbums(lastAlbumSearch);
+        setAlbums(sortItems(data, sortOption));
+      } catch (err) {
+        setError('Greška pri dohvatanju albuma.');
+      } finally {
+        setLoadingAlbums(false);
+      }
+    };
+    fetchAlbums();
+  }, [lastAlbumSearch]);
+
+  useEffect(() => {
+    if (!lastArtistSearch) return;
+    const fetchArtists = async () => {
+      setLoadingArtists(true);
+      setError('');
+      try {
+        const data = await musicService.getArtists(lastArtistSearch);
+        setArtists(sortItems(data, sortOption));
+      } catch (err) {
+        setError('Greška pri dohvatanju izvođača.');
+      } finally {
+        setLoadingArtists(false);
+      }
+    };
+    fetchArtists();
+  }, [lastArtistSearch]);
+
   const handleLike = async (id, rating, type) => {
     try {
       const likeData = type === 'album' ? { albumId: id, rating } : { artistId: id, rating };
       await musicService.addLike(likeData);
       
-      if (type === 'album') {
-        setAlbums(prevAlbums => 
-          prevAlbums.map(album => 
-            album.id === id ? { ...album, rating: rating } : album
-          )
-        );
-      } else {
-        setArtists(prevArtists => 
-          prevArtists.map(artist => 
-            artist.id === id ? { ...artist, rating: rating } : artist
-          )
-        );
-      }
+      const updateState = (items) => items.map(item => item.id === id ? { ...item, rating } : item);
+      if (type === 'album') setAlbums(updateState);
+      else setArtists(updateState);
 
     } catch (error) {
-      console.error('Greška pri dodavanju like-a:', error);
       const errorMessage = error.response?.data?.error || 'Greška pri dodavanju ocjene.';
       setError(errorMessage);
     }
@@ -81,11 +95,16 @@ function Browse() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchData(searchQuery);
-  };
+    if (!searchQuery) return;
 
-  const handleSortChange = (e) => {
-    setSortOption(e.target.value);
+    if (activeTab === 'albums') {
+      setLastAlbumSearch(searchQuery);
+    } else if (activeTab === 'artists') {
+      setLastArtistSearch(searchQuery);
+    } else {
+      setLastAlbumSearch(searchQuery);
+      setLastArtistSearch(searchQuery);
+    }
   };
 
   return (
@@ -111,7 +130,7 @@ function Browse() {
               </svg>
             </div>
           </form>
-          <select value={sortOption} onChange={handleSortChange} className="p-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-blue-400">
+          <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} className="p-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-blue-400">
             <option value="name-asc">Name (A-Z)</option>
             <option value="name-desc">Name (Z-A)</option>
           </select>
@@ -125,51 +144,35 @@ function Browse() {
           ))}
         </div>
 
-         {loading ? (
-          <p className="text-center text-gray-400">Loading...</p>
-        ) : (
-          <div className="space-y-12">
-            {/* Albumi */}
-            {(activeTab === 'all' || activeTab === 'albums') && albums.length > 0 && (
-              <div>
-                <h3 className="text-2xl font-semibold mb-4">Albums</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {albums.map((album) => (
-                    <AlbumCard
-                      key={album.id}
-                      album={album}
-                      onLike={(rating) => handleLike(album.id, rating, 'album')}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+        <div className="space-y-12">
+          {/* Albumi */}
+          {(activeTab === 'all' || activeTab === 'albums') && (
+            <div>
+              <h3 className="text-2xl font-semibold mb-4">Albums</h3>
+              {loadingAlbums ? <p className="text-center text-gray-400">Loading albums...</p> : 
+                albums.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {albums.map((album) => <AlbumCard key={album.id} album={album} onLike={(r) => handleLike(album.id, r, 'album')} />)}
+                  </div>
+                ) : <p className="text-center text-gray-400">No albums to display. Enter a search term and press Enter.</p>
+              }
+            </div>
+          )}
 
-            {/* Izvođači */}
-            {(activeTab === 'all' || activeTab === 'artists') && artists.length > 0 && (
-              <div>
-                <h3 className="text-2xl font-semibold mb-4">Artists</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {artists.map((artist) => (
-                    <ArtistCard
-                      key={artist.id}
-                      artist={artist}
-                      onLike={(rating) => handleLike(artist.id, rating, 'artist')}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {/* Prazan prikaz */}
-            {!loading && activeTab === 'albums' && albums.length === 0 && (
-              <p className="text-center text-gray-400">Nema albuma za prikaz.</p>
-            )}
-            {!loading && activeTab === 'artists' && artists.length === 0 && (
-              <p className="text-center text-gray-400">Nema izvođača za prikaz.</p>
-            )}
-          </div>
-        )}
+          {/* Izvođači */}
+          {(activeTab === 'all' || activeTab === 'artists') && (
+            <div>
+              <h3 className="text-2xl font-semibold mb-4">Artists</h3>
+              {loadingArtists ? <p className="text-center text-gray-400">Loading artists...</p> :
+                artists.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {artists.map((artist) => <ArtistCard key={artist.id} artist={artist} onLike={(r) => handleLike(artist.id, r, 'artist')} />)}
+                  </div>
+                ) : <p className="text-center text-gray-400">No artists to display. Enter a search term and press Enter.</p>
+              }
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

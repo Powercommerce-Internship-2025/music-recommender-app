@@ -1,41 +1,65 @@
-// server/controllers/musicController.js
 import { Op } from 'sequelize';
 import { Album, Like, User, Artist } from '../models/index.js';
 import lastfmService from '../services/lastfmService.js';
 
-/*
-  Dohvatanje svih albuma iz baze ili Last.fm
-*/
+const parseTags = (tags) => {
+  if (!tags) return [];
+  if (Array.isArray(tags)) {
+    return tags.map(t => t.name);
+  }
+  if (typeof tags === 'object' && tags.name) {
+    return [tags.name];
+  }
+  return [];
+};
+
 const getAlbums = async (req, res) => {
   try {
     const { query } = req.query;
     if (query) {
       const result = await lastfmService.searchAlbums(query);
-      const albumsFromApi = Array.isArray(result) ? result : result.results?.albummatches?.album || [];
+      const albumsFromApi = result.results?.albummatches?.album || [];
       
-      const dbAlbums = await Promise.all(albumsFromApi.map(async (albumApi) => {
-        const [albumDb] = await Album.findOrCreate({
+      const albumPromises = albumsFromApi.map(async (albumApi) => {
+        if (!albumApi.name || !albumApi.artist) return null;
+
+        const albumInfo = await lastfmService.getAlbumInfo(albumApi.artist, albumApi.name);
+        
+        let genres = parseTags(albumInfo?.album?.tags?.tag);
+
+        if (genres.length === 0) {
+          const artistInfo = await lastfmService.getArtistInfo(albumApi.artist);
+          genres = parseTags(artistInfo?.artist?.tags?.tag);
+        }
+
+        const description = albumInfo?.album?.wiki?.summary?.replace(/<a.*<\/a>/, '').trim() || null;
+        const publishedDate = albumInfo?.album?.wiki?.published;
+        const year = publishedDate ? new Date(publishedDate).getFullYear() : null;
+
+        const [albumDb, created] = await Album.findOrCreate({
           where: { name: albumApi.name, artist: albumApi.artist },
           defaults: {
             name: albumApi.name,
             artist: albumApi.artist,
             coverArt: albumApi.image?.find(img => img.size === 'large')?.['#text'] || '',
-            // Ostala polja će biti default ili null
-            genres: [],
+            genres,
+            description,
+            year,
           },
         });
+
+        if (!created && (!albumDb.description || albumDb.genres.length === 0)) {
+          await albumDb.update({
+            description: albumDb.description || description,
+            genres: albumDb.genres.length === 0 ? genres : albumDb.genres,
+            year: albumDb.year || year,
+          });
+        }
         
-        // Vraćamo kombinaciju podataka iz baze (ID) i sa API-ja (slike, itd.)
-        return {
-          ...albumApi, // Zadržavamo originalne podatke sa API-ja
-          id: albumDb.id, // Dodajemo ID iz naše baze
-          coverArt: albumDb.coverArt,
-          genres: albumDb.genres,
-          year: albumDb.year,
-          description: albumDb.description,
-        };
-      }));
+        return albumDb.reload();
+      });
       
+      const dbAlbums = (await Promise.all(albumPromises)).filter(Boolean);
       res.json(dbAlbums);
     } else {
       const albums = await Album.findAll();
@@ -47,28 +71,37 @@ const getAlbums = async (req, res) => {
   }
 };
 
-/*
-  Dohvatanje svih izvođača iz baze ili Last.fm
-*/
 const getArtists = async (req, res) => {
   try {
     const { query } = req.query;
     if (query) {
       const result = await lastfmService.searchArtists(query);
-      const artistsFromApi = Array.isArray(result) ? result : result.results?.artistmatches?.artist || [];
+      const artistsFromApi = result.results?.artistmatches?.artist || [];
       
       const dbArtists = await Promise.all(artistsFromApi.map(async (artistApi) => {
-        const [artistDb] = await Artist.findOrCreate({
+        const artistInfo = await lastfmService.getArtistInfo(artistApi.name);
+        const genres = parseTags(artistInfo?.artist?.tags?.tag);
+        const description = artistInfo?.artist?.bio?.summary?.replace(/<a.*<\/a>/, '').trim() || null;
+
+        const [artistDb, created] = await Artist.findOrCreate({
           where: { name: artistApi.name },
           defaults: {
             name: artistApi.name,
-            genres: [],
+            genres,
+            description,
           },
         });
-        
+
+        if (!created && (artistDb.genres.length === 0 || !artistDb.description)) {
+            await artistDb.update({
+                genres: artistDb.genres.length === 0 ? genres : artistDb.genres,
+                description: artistDb.description || description,
+            });
+        }
+
         return {
           ...artistApi,
-          id: artistDb.id, // Dodajemo ID iz naše baze
+          id: artistDb.id,
           image: artistApi.image?.find(img => img.size === 'large')?.['#text'] || '',
           genres: artistDb.genres,
           description: artistDb.description,
@@ -86,9 +119,6 @@ const getArtists = async (req, res) => {
   }
 };
 
-/*
-  Lajkanje ili ocjenjivanje albuma/izvođača
-*/
 const addLike = async (req, res) => {
   try {
     const { albumId, artistId, rating } = req.body;
@@ -98,7 +128,6 @@ const addLike = async (req, res) => {
       return res.status(400).json({ error: 'Morate navesti albumId ili artistId' });
     }
 
-    // Provjeri da li album ili izvođač postoje u bazi
     if (albumId) {
       const album = await Album.findOne({ where: { id: albumId } });
       if (!album) return res.status(404).json({ error: 'Album nije pronađen' });
@@ -112,7 +141,6 @@ const addLike = async (req, res) => {
     if (albumId) likeData.albumId = albumId;
     if (artistId) likeData.artistId = artistId;
     
-    // Ispravka za unique constraint
     const whereClause = { userId };
     if (albumId) whereClause.albumId = albumId;
     if (artistId) whereClause.artistId = artistId;
@@ -120,11 +148,9 @@ const addLike = async (req, res) => {
     const like = await Like.findOne({ where: whereClause });
 
     if (like) {
-      // Ako like postoji, ažuriraj rating
       await like.update({ rating });
        res.status(200).json({ message: 'Like ažuriran', like });
     } else {
-      // Ako ne postoji, kreiraj novi
       const newLike = await Like.create(likeData);
       res.status(201).json({ message: 'Like dodan', like: newLike });
     }
