@@ -28,7 +28,7 @@ cd server/
 touch .env      
    ```  
 
-Add the following variables to the **.env** file (replace "your_username & your_password" with your password):    
+Add the following variables to the **.env** file (replace "your_username & your_password" with your username & password):    
 
 ```bash
 DATABASE_URL=your_username://postgres:your_password@localhost:5432/music_db    
