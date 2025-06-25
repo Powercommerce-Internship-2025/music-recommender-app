@@ -1,4 +1,4 @@
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import { Album, Like, User, Artist } from '../models/index.js';
 import lastfmService from '../services/lastfmService.js';
 
@@ -161,4 +161,71 @@ const addLike = async (req, res) => {
   }
 };
 
-export default { getAlbums, getArtists, addLike };
+/*
+  Generisanje preporuka za korisnika
+*/
+const getRecommendations = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const RATING_THRESHOLD = 4;
+    const RECOMMENDATION_LIMIT = 10;
+
+    const userLikes = await Like.findAll({
+      where: {
+        userId,
+        rating: { [Op.gte]: RATING_THRESHOLD },
+      },
+    });
+
+    if (userLikes.length === 0) {
+      return res.json({
+        recommendedAlbums: [],
+        recommendedArtists: [],
+        message: 'Rate more items with 4 or 5 stars to get recommendations.',
+      });
+    }
+
+    const likedAlbumIds = userLikes.filter(l => l.albumId).map(l => l.albumId);
+    const likedArtistIds = userLikes.filter(l => l.artistId).map(l => l.artistId);
+
+    const likedAlbums = await Album.findAll({ where: { id: { [Op.in]: likedAlbumIds } } });
+    const likedArtists = await Artist.findAll({ where: { id: { [Op.in]: likedArtistIds } } });
+
+    const favoriteGenres = new Set([
+      ...likedAlbums.flatMap(a => a.genres),
+      ...likedArtists.flatMap(a => a.genres),
+    ]);
+    
+    const favoriteGenresArray = [...favoriteGenres];
+
+    if (favoriteGenresArray.length === 0) {
+        return res.json({ recommendedAlbums: [], recommendedArtists: [], message: 'We could not determine your favorite genres.' });
+    }
+
+    const recommendedAlbums = await Album.findAll({
+      where: {
+        id: { [Op.notIn]: likedAlbumIds },
+        genres: { [Op.overlap]: favoriteGenresArray },
+      },
+      limit: RECOMMENDATION_LIMIT,
+      order: Sequelize.literal('RANDOM()'),
+    });
+
+    const recommendedArtists = await Artist.findAll({
+      where: {
+        id: { [Op.notIn]: likedArtistIds },
+        genres: { [Op.overlap]: favoriteGenresArray },
+      },
+      limit: RECOMMENDATION_LIMIT,
+      order: Sequelize.literal('RANDOM()'),
+    });
+
+    res.json({ recommendedAlbums, recommendedArtists });
+
+  } catch (error) {
+    console.error('Greška pri generisanju preporuka:', error);
+    res.status(500).json({ error: 'Greška pri generisanju preporuka' });
+  }
+};
+
+export default { getAlbums, getArtists, addLike, getRecommendations };

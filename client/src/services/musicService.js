@@ -88,6 +88,20 @@ const musicService = {
       throw error;
     }
   },
+
+  /**
+   * Dohvatanje preporuka
+   * @returns {Promise}
+   */
+  getRecommendations: async () => {
+    try {
+      const response = await apiClient.get('/recommendations');
+      return response.data;
+    } catch (error) {
+      console.error('Greška pri dohvatanju preporuka:', error.response?.data || error.message);
+      throw error;
+    }
+  },
 };
 
 export default musicService;
