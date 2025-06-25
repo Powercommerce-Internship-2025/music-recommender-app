@@ -11,5 +11,6 @@ const router = express.Router();
 router.get('/albums', musicController.getAlbums);
 router.get('/artists', musicController.getArtists);
 router.post('/like', authMiddleware, musicController.addLike);
+router.get('/recommendations', authMiddleware, musicController.getRecommendations);
 
 export default router;
