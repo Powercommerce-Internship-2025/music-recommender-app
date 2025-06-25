@@ -1,6 +1,37 @@
-# **Music Recommender App**
+# 🎵 Music Recommender App
 
-## **Installation Guide**
+## 📝 Project Description
+
+Music Recommender App is a full-stack web application designed to help users discover new music albums and artists based on their preferences. Users can browse through a catalog of albums and artists, rate them, and receive personalized recommendations. The goal of the application is to enhance the music discovery experience in a simple and user-friendly way.
+
+---
+
+## 🚀 Features
+
+- User authentication (sign up, login, logout)
+- Profile management with personal preferences
+- Browse catalog of albums and artists
+- View album/artist details: name, genre, year, cover art, and description
+- Rate albums and artists
+- Receive recommendations based on user preferences
+- Clean and responsive user interface
+- Integration with **Last.fm API** for real music data
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React + Tailwind CSS  
+- **Backend:** Node.js + Express  
+- **Database:** PostgreSQL  
+- **ORM:** Sequelize  
+- **Authentication:** JSON Web Token (JWT)  
+- **Environment Variables:** dotenv-cli
+- **Music API:** [Last.fm API](https://www.last.fm/api)
+
+---
+
+## **📦 Installation Guide**
 
 ---
 
