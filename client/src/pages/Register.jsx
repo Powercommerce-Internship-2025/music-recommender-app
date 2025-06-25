@@ -7,7 +7,6 @@ import { validateEmail, validatePassword, validateUsername } from '../utils/vali
 import AuthLayout from '../components/AuthLayout';
 
 function Register() {
-  // ... state i funkcije ostaju iste ...
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,7 +31,7 @@ function Register() {
     setErrors({});
     try {
       await authService.register({ username, email, password });
-      toast.success('Registracija uspješna! Molimo prijavite se.');
+      toast.success('Registration successful!');
       navigate('/login');
     } catch (err) {
       const errorMessage = err.response?.data?.error || 'Greška pri registraciji';
@@ -43,7 +42,6 @@ function Register() {
   };
 
   return (
-    // DODAJEMO OVAJ WRAPPER DIV
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-blue-900">
       <AuthLayout
         title="Sign Up"
@@ -51,7 +49,6 @@ function Register() {
         footerLink="/login"
       >
         <form onSubmit={handleSubmit}>
-          {/* ... sadržaj forme ostaje isti ... */}
           <div className="mb-4">
             <label className="block mb-1 font-medium">Username</label>
             <input
