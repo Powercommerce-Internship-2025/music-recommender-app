@@ -63,3 +63,9 @@ npm install
 ```
 
 ---
+
+### 5. OPEN:  
+  
+http://localhost:5173/  
+
+---
