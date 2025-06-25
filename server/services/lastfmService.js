@@ -1,5 +1,3 @@
-// server/services/lastfmService.js
-
 import axios from 'axios';
 import md5 from 'md5';
 import NodeCache from 'node-cache';
@@ -76,6 +74,50 @@ const lastfmService = {
     } catch (error) {
       console.error('Greška pri pretrazi izvođača:', error.response?.data || error.message);
       throw error;
+    }
+  },
+
+  /**
+   * Dohvatanje detaljnih informacija o albumu
+   * @param {string} artist
+   * @param {string} album
+   * @returns {Promise}
+   */
+  getAlbumInfo: async (artist, album) => {
+    if (!artist || !album) return null;
+    try {
+      const params = {
+        method: 'album.getInfo',
+        api_key: API_KEY,
+        artist,
+        album,
+        format: 'json',
+      };
+      return await lastfmService.callApi(params);
+    } catch (error) {
+      console.error(`Greška pri dohvatanju info za album ${artist} - ${album}:`, error.response?.data || error.message);
+      return null;
+    }
+  },
+
+  /**
+   * Dohvatanje detaljnih informacija o izvođaču
+   * @param {string} artist
+   * @returns {Promise}
+   */
+  getArtistInfo: async (artist) => {
+    if (!artist) return null;
+    try {
+      const params = {
+        method: 'artist.getInfo',
+        api_key: API_KEY,
+        artist,
+        format: 'json',
+      };
+      return await lastfmService.callApi(params);
+    } catch (error) {
+      console.error(`Greška pri dohvatanju info za izvođača ${artist}:`, error.response?.data || error.message);
+      return null;
     }
   },
 };
