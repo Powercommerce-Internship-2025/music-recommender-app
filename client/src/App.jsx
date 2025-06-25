@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Browse from './pages/Browse';
+import Recommendations from './pages/Recommendations';
 import Navbar from './components/Navbar';
 
 /**
@@ -37,6 +38,14 @@ function App() {
           element={
             <>
               <Browse />
+            </>
+          }
+        />
+        <Route
+          path="/recommendations"
+          element={
+            <>
+              <Recommendations />
             </>
           }
         />
