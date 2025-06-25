@@ -3,43 +3,31 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 
-    Animacija za fade-in na naslov 
-*/
-
+/* Animacija za fade-in */
 @keyframes fade-in {
   0% { opacity: 0; transform: translateY(20px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fade-in 1s ease-out;
+  animation: fade-in 1s ease-out forwards;
 }
 
-/* 
-    Animacija za skaliranje dugmadi na hover 
-*/
+/* Dodavanje kašnjenja animaciji */
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-400 { animation-delay: 400ms; }
 
+/* Animacija za skaliranje dugmadi na hover */
 .btn-scale {
   @apply transform transition duration-300 hover:scale-105;
 }
 
-/* 
-    Gradient pozadina 
-*/
-
-.bg-gradient-hero {
-  background: linear-gradient(135deg, #1e3a8a, #7c3aed);
-}
-
-/* 
-    Globalni stilovi 
-*/
-
+/* Globalni stilovi */
 body {
-  @apply bg-gray-100 font-['Poppins'];
+  @apply bg-gray-900 font-['Poppins'] text-white;
 }
 
+/* Animacija za pop efekat na karticama */
 @keyframes pop {
   0% { transform: scale(1); }
   50% { transform: scale(1.08); }

@@ -7,7 +7,6 @@ const apiClient = axios.create({
   }
 });
 
-// Interceptor za dodavanje tokena u zaglavlja
 apiClient.interceptors.request.use(
   config => {
     const token = localStorage.getItem('token');
