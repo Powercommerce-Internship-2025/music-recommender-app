@@ -3,12 +3,9 @@ import cors from 'cors';
 import sequelize from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import musicRoutes from './routes/musicRoutes.js';
+import userRoutes from './routes/userRoutes.js'; // Novo
 
 const app = express();
-
-/*
-  Dozvole za zahtjeve sa localhosta 5173
-*/
 
 app.use(cors({
   origin: 'http://localhost:5173',
@@ -19,6 +16,7 @@ app.use(cors({
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/music', musicRoutes);
+app.use('/api/users', userRoutes); // Novo
 
 app.get('/health', (req, res) => {
   res.json({ message: 'Music Recommender API' });

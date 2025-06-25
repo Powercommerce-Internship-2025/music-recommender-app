@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FaUserPlus } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 import authService from '../services/authService';
 import { validateEmail, validatePassword, validateUsername } from '../utils/validators';
+import AuthLayout from '../components/AuthLayout';
 
-/**
- * Stranica za registraciju korisnika
- * @returns {JSX.Element} Forma za registraciju
- */
 function Register() {
+  // ... state i funkcije ostaju iste ...
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,21 +32,26 @@ function Register() {
     setErrors({});
     try {
       await authService.register({ username, email, password });
+      toast.success('Registracija uspješna! Molimo prijavite se.');
       navigate('/login');
     } catch (err) {
-      setErrors({ server: err.response?.data?.error || 'Greška pri registraciji' });
-      console.error('Greška pri registraciji:', err);
+      const errorMessage = err.response?.data?.error || 'Greška pri registraciji';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero text-white flex items-center justify-center px-4">
-      <div className="bg-white bg-opacity-10 backdrop-blur-lg p-8 rounded-xl max-w-md w-full animate-fade-in">
-        <h2 className="text-3xl font-bold mb-6 text-center">Sign up</h2>
-        {errors.server && <p className="text-red-300 mb-4 text-center">{errors.server}</p>}
+    // DODAJEMO OVAJ WRAPPER DIV
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-blue-900">
+      <AuthLayout
+        title="Sign Up"
+        footerText="You already have an account?"
+        footerLink="/login"
+      >
         <form onSubmit={handleSubmit}>
+          {/* ... sadržaj forme ostaje isti ... */}
           <div className="mb-4">
             <label className="block mb-1 font-medium">Username</label>
             <input
@@ -57,7 +61,7 @@ function Register() {
               className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-blue-500"
               required
             />
-            {errors.username && <p className="text-red-300 mt-1">{errors.username}</p>}
+            {errors.username && <p className="text-red-300 mt-1 text-sm">{errors.username}</p>}
           </div>
           <div className="mb-4">
             <label className="block mb-1 font-medium">Email</label>
@@ -68,7 +72,7 @@ function Register() {
               className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-blue-500"
               required
             />
-            {errors.email && <p className="text-red-300 mt-1">{errors.email}</p>}
+            {errors.email && <p className="text-red-300 mt-1 text-sm">{errors.email}</p>}
           </div>
           <div className="mb-6">
             <label className="block mb-1 font-medium">Password</label>
@@ -79,7 +83,7 @@ function Register() {
               className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-blue-500"
               required
             />
-            {errors.password && <p className="text-red-300 mt-1">{errors.password}</p>}
+            {errors.password && <p className="text-red-300 mt-1 text-sm">{errors.password}</p>}
           </div>
           <button
             type="submit"
@@ -88,18 +92,12 @@ function Register() {
           >
             {loading ? 'Loading...' : (
               <>
-                <FaUserPlus className="mr-2" /> Sign up
+                <FaUserPlus className="mr-2" /> Sign Up
               </>
             )}
           </button>
         </form>
-        <p className="mt-4 text-center">
-          You already have an account?{' '}
-          <Link to="/login" className="text-blue-400 hover:text-blue-300">
-            Sign in
-          </Link>
-        </p>
-      </div>
+      </AuthLayout>
     </div>
   );
 }
