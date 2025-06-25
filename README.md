@@ -22,9 +22,19 @@ psql -U postgres -c "CREATE DATABASE music_db;"
 ---
 
 ### 3. Configure backend:  
-  Navigate to the server directory: cd server/  
-  Open **.env** file in the **server/** root and add the following environment variables.  
-  Replace "password" with your actual PostgreSQL password.  
+  Navigate to the server directory:  
+  ```bash  
+cd server/
+touch .env      
+   ```  
+
+Add the following variables to the **.env** file (replace "your_username & your_password" with your password):    
+
+```bash
+DATABASE_URL=your_username://postgres:your_password@localhost:5432/music_db    
+JWT_SECRET=secret    
+PORT=5000  
+```  
   
   **Install backend dependencies:**  
   ```bash
